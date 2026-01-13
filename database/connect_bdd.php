@@ -14,6 +14,7 @@ $dbpasswd="userSC";
 // 		die();
 // 	}
 
+
 try {
     $pdo = new PDO('mysql:host='.$dbhost.';dbname='.$db, $dbuser, $dbpasswd);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

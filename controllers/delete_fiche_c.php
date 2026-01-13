@@ -1,4 +1,4 @@
 <?php
-include ("delete_fiche_m.php");
-include ("delete_fiche_v.php");
+include ("./models/delete_fiche_m.php");
+include ("./views/delete_fiche_v.php");
 ?>
