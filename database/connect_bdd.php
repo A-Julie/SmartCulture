@@ -1,29 +1,21 @@
 <?php
-$db="smartculture";
-$dbhost="localhost";
-$dbport = "3306"; // Port MySQL par défaut
-$dbuser="userSC";
-$dbpasswd="userSC";
- 
-// try {
-// 		$pdo = new PDO('mysql:host='.$dbhost.';port='.$dbport.';dbname='.$db.'', $dbuser, $dbpasswd);
-// 	}
-// catch (PDOException $e)
-// 	{
-// 		print "Erreur !: " . $e->getMessage() . "<br/>";
-// 		die();
-// 	}
-
+$db = "smartculture";
+$dbhost = "localhost";
+$dbport = "3306";
+$dbuser = "userSC";
+$dbpasswd = "userSC";
 
 try {
-    $pdo = new PDO('mysql:host='.$dbhost.';dbname='.$db, $dbuser, $dbpasswd);
+    $pdo = new PDO('mysql:host='.$dbhost.';port='.$dbport.';dbname='.$db, $dbuser, $dbpasswd);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
     
-    echo "✅ Connexion réussie !";
+    // Retourner la connexion
+    return $pdo;
     
 } catch (PDOException $e) {
-    echo "❌ Erreur : " . $e->getMessage();
-    die();
+    die("❌ Erreur de connexion : " . $e->getMessage());
 }
 ?>
-?>
+
+

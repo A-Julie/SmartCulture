@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : mar. 13 jan. 2026 à 12:50
+-- Généré le : mar. 13 jan. 2026 à 13:14
 -- Version du serveur : 9.1.0
 -- Version de PHP : 8.3.14
 
@@ -118,6 +118,34 @@ INSERT INTO `livres` (`id`, `titre`, `editeurs`, `date_publication`) VALUES
 (0, 'Harry Potter à l\'école des sorciers', 'Gallimard Jeunesse', '1998'),
 (0, 'L\'Étranger', 'Gallimard', '1942'),
 (0, 'Les Misérables', 'Albert Lacroix et Cie', '1862');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `utilisateurs`
+--
+
+DROP TABLE IF EXISTS `utilisateurs`;
+CREATE TABLE IF NOT EXISTS `utilisateurs` (
+  `id_utilisateur` int NOT NULL AUTO_INCREMENT,
+  `nom` varchar(100) NOT NULL,
+  `prenom` varchar(100) NOT NULL,
+  `email` varchar(150) NOT NULL,
+  `mot_de_passe` varchar(255) NOT NULL,
+  `date_creation` datetime DEFAULT CURRENT_TIMESTAMP,
+  `actif` tinyint(1) DEFAULT '1',
+  PRIMARY KEY (`id_utilisateur`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `utilisateurs`
+--
+
+INSERT INTO `utilisateurs` (`id_utilisateur`, `nom`, `prenom`, `email`, `mot_de_passe`, `date_creation`, `actif`) VALUES
+(1, 'Paul', 'Marie', 'admin@smartculture.fr', 'user1', '2026-01-13 14:13:17', 1),
+(2, 'Paul', 'Marie', 'admin@smartculture1.fr', 'user1', '2026-01-13 14:14:02', 1),
+(3, 'Dupont', 'Jean', 'client@test.fr', 'user2', '2026-01-13 14:14:02', 1);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
