@@ -1,4 +1,4 @@
-<?php
+ <?php
 function loginUser($pdo, $email, $password) {
     $query = "SELECT * FROM utilisateurs WHERE email = :email AND actif = TRUE";
     $stmt = $pdo->prepare($query);
@@ -12,7 +12,8 @@ function loginUser($pdo, $email, $password) {
     return false;
 }
 
-function registerUser($pdo, $nom, $prenom, $email, $password) {
+ // ⬇️⬇️⬇️ MODIFIEZ CETTE FONCTION ⬇️⬇️⬇️
+function registerUser($pdo, $nom, $prenom, $email, $password, $role = 'user') {
     try {
         // Vérifier si l'email existe déjà
         $check_query = "SELECT id_utilisateur FROM utilisateurs WHERE email = :email";
@@ -26,16 +27,22 @@ function registerUser($pdo, $nom, $prenom, $email, $password) {
         // Hasher le mot de passe
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         
-        // Insérer le nouvel utilisateur
-        $query = "INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, actif) 
-                  VALUES (:nom, :prenom, :email, :password, TRUE)";
+        // Valider le rôle
+        if (!in_array($role, ['user', 'admin'])) {
+            $role = 'user';
+        }
+        
+        // Insérer le nouvel utilisateur avec le rôle
+        $query = "INSERT INTO utilisateurs (nom, prenom, email, mot_de_passe, role, actif) 
+                  VALUES (:nom, :prenom, :email, :password, :role, TRUE)";
         $stmt = $pdo->prepare($query);
         
         return $stmt->execute([
             'nom' => $nom,
             'prenom' => $prenom,
             'email' => $email,
-            'password' => $hashed_password
+            'password' => $hashed_password,
+            'role' => $role
         ]);
         
     } catch (PDOException $e) {
@@ -44,8 +51,13 @@ function registerUser($pdo, $nom, $prenom, $email, $password) {
     }
 }
 
+
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
+}
+
+function isAdmin() {
+    return isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
 }
 
 function getUserInfo() {
@@ -54,7 +66,8 @@ function getUserInfo() {
             'id' => $_SESSION['user_id'],
             'nom' => $_SESSION['user_nom'],
             'prenom' => $_SESSION['user_prenom'],
-            'email' => $_SESSION['user_email']
+            'email' => $_SESSION['user_email'],
+            'role' => $_SESSION['user_role']
         ];
     }
     return null;
