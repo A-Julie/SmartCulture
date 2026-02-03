@@ -1,91 +1,95 @@
-        // Panier (stocké dans localStorage)
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+// Panier (stocké dans localStorage)
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+// Mettre à jour le compteur du panier au chargement
+updateCartCount();
+
+function addToCart(product) {
+    // Vérifier si le produit existe déjà
+    const existingItem = cart.find(item => item.id === product.id && item.type === product.type);
+    
+    if (existingItem) {
+        alert('Ce produit est déjà dans votre panier !');
+        return;
+    }
+    
+    cart.push(product);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    
+    // Animation de feedback
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Ajouté !';
+    btn.style.background = '#28a745';
+    
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.style.background = '';
+    }, 1500);
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    localStorage.setItem('cart', JSON.stringify(cart));
+    updateCartCount();
+    displayCart();
+}
+
+function updateCartCount() {
+    const cartCountElement = document.getElementById('cart-count');
+    if (cartCountElement) {
+        cartCountElement.textContent = cart.length;
+    }
+}
+
+function displayCart() {
+    const cartContent = document.getElementById('cart-content');
+    const cartFooter = document.getElementById('cart-footer');
+    
+    if (cart.length === 0) {
+        cartContent.innerHTML = `
+            <div class="cart-empty">
+                <div class="cart-empty-icon">🛒</div>
+                <p>Votre panier est vide</p>
+            </div>
+        `;
+        cartFooter.style.display = 'none';
+        return;
+    }
+    
+    let total = 0;
+    let html = '<div class="cart-items">';
+    
+    cart.forEach((item, index) => {
+        const price = parseFloat(item.prix) || 0;
+        total += price;
         
-        // Mettre à jour le compteur du panier au chargement
-        updateCartCount();
-        
-        function addToCart(product) {
-            // Vérifier si le produit existe déjà
-            const existingItem = cart.find(item => item.id === product.id && item.type === product.type);
-            
-            if (existingItem) {
-                alert('Ce produit est déjà dans votre panier !');
-                return;
-            }
-            
-            cart.push(product);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            
-            // Animation de feedback
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '✓ Ajouté !';
-            btn.style.background = '#28a745';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.style.background = '';
-            }, 1500);
-        }
-        
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            displayCart();
-        }
-        
-        function updateCartCount() {
-            document.getElementById('cart-count').textContent = cart.length;
-        }
-        
-        function displayCart() {
-            const cartContent = document.getElementById('cart-content');
-            const cartFooter = document.getElementById('cart-footer');
-            
-            if (cart.length === 0) {
-                cartContent.innerHTML = `
-                    <div class="cart-empty">
-                        <div class="cart-empty-icon">🛒</div>
-                        <p>Votre panier est vide</p>
-                    </div>
-                `;
-                cartFooter.style.display = 'none';
-                return;
-            }
-            
-            let total = 0;
-            let html = '<div class="cart-items">';
-            
-            cart.forEach((item, index) => {
-                const price = parseFloat(item.prix) || 0;
-                total += price;
-                
-                html += `
-                    <div class="cart-item">
-                        <div class="cart-item-image">
-                            ${item.type === 'DVD' ? '💿' : '💎'}
-                        </div>
-                        <div class="cart-item-info">
-                            <div class="cart-item-title">${item.titre}</div>
-                            <div class="cart-item-type">${item.type}</div>
-                        </div>
-                        <div class="cart-item-price">${price.toFixed(2).replace('.', ',')} €</div>
-                        <button class="cart-item-remove" onclick="removeFromCart(${index})" title="Retirer">
-                            ×
-                        </button>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            cartContent.innerHTML = html;
-            
-            document.getElementById('cart-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
-            cartFooter.style.display = 'block';
-        }
-       function openModal(type) {
+        html += `
+            <div class="cart-item">
+                <div class="cart-item-image">
+                    ${item.type === 'DVD' ? '💿' : '💎'}
+                </div>
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.titre}</div>
+                    <div class="cart-item-type">${item.type}</div>
+                </div>
+                <div class="cart-item-price">${price.toFixed(2).replace('.', ',')} €</div>
+                <button class="cart-item-remove" onclick="removeFromCart(${index})" title="Retirer">
+                    ×
+                </button>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    cartContent.innerHTML = html;
+    
+    document.getElementById('cart-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
+    cartFooter.style.display = 'block';
+}
+
+function openModal(type) {
     if (type === 'cart') {
         displayCart();
         document.getElementById('cart-modal').classList.add('active');
@@ -109,28 +113,43 @@ function closeModal(type) {
         document.getElementById('edit-product-modal').classList.remove('active');
     }
 }
-        
-        // Fermer la modal en cliquant à l'extérieur
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('active');
-            }
-        }
-        
-        function logout() {
-            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-                window.location.href = '../controllers/authentication_c.php?action=logout';
-            }
-        }
-        
-        function checkout() {
-            if (cart.length === 0) return;
-            
-            alert('Redirection vers la page de paiement...\n\nTotal : ' + document.getElementById('cart-total').textContent);
-            // TODO: Implémenter la page de commande
-        }
 
-        function submitProduct(event) {
+// Fermer la modal en cliquant à l'extérieur
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('active');
+    }
+}
+
+function logout() {
+    if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+        window.location.href = '../controllers/authentication_c.php?action=logout';
+    }
+}
+
+//  NOUVELLE FONCTION CHECKOUT 
+function checkout() {
+    if (cart.length === 0) {
+        alert('Votre panier est vide !');
+        return;
+    }
+    
+    // Créer un formulaire pour envoyer le panier en POST
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '../controllers/payment_c.php';
+    
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'cart';
+    input.value = JSON.stringify(cart);
+    
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function submitProduct(event) {
     event.preventDefault();
     
     const form = document.getElementById('add-product-form');
@@ -140,7 +159,7 @@ function closeModal(type) {
     const submitBtn = form.querySelector('.btn-submit');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '⏳ Ajout en cours...';
+    submitBtn.innerHTML = 'Ajout en cours...';
     
     fetch('../controllers/produit_add_c.php', {
         method: 'POST',
@@ -149,36 +168,35 @@ function closeModal(type) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(data.message);
             closeModal('add-product');
             form.reset();
-            location.reload(); // Recharger la page pour voir le nouveau produit
+            location.reload();
         } else {
-            alert('❌ ' + data.message);
+            alert(data.message);
         }
     })
     .catch(error => {
         console.error('Erreur:', error);
-        alert('❌ Une erreur est survenue');
+        alert('Une erreur est survenue');
     })
     .finally(() => {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
     });
 }
+
 // Fonction pour modifier un produit
 function editProduct(product) {
-    // Remplir le formulaire avec les données du produit
     document.getElementById('edit-product-id').value = product.id;
     document.getElementById('edit-product-type').value = product.type;
-    document.getElementById('edit-type-display').value = product.type === 'DVD' ? '💿 DVD' : '💎 Blu-ray';
+    document.getElementById('edit-type-display').value = product.type === 'DVD' ? 'DVD' : 'Blu-ray';
     document.getElementById('edit-product-title').value = product.titre;
     document.getElementById('edit-product-date').value = product.date_sortie;
     document.getElementById('edit-product-description').value = product.description || '';
     document.getElementById('edit-product-price').value = product.prix || 0;
     document.getElementById('edit-product-stock').value = product.stock || 0;
     
-    // Ouvrir la modal
     openModal('edit-product');
 }
 
@@ -193,7 +211,7 @@ function submitEditProduct(event) {
     const submitBtn = form.querySelector('.btn-submit');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '⏳ Modification en cours...';
+    submitBtn.innerHTML = 'Modification en cours...';
     
     fetch('../controllers/produit_manage_c.php', {
         method: 'POST',
@@ -202,16 +220,16 @@ function submitEditProduct(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(data.message);
             closeModal('edit-product');
             location.reload();
         } else {
-            alert('❌ ' + data.message);
+            alert(data.message);
         }
     })
     .catch(error => {
         console.error('Erreur:', error);
-        alert('❌ Une erreur est survenue');
+        alert('Une erreur est survenue');
     })
     .finally(() => {
         submitBtn.disabled = false;
@@ -221,7 +239,7 @@ function submitEditProduct(event) {
 
 // Fonction pour supprimer un produit
 function deleteProduct(id, type) {
-    if (!confirm('⚠️ Êtes-vous sûr de vouloir supprimer ce produit ?\n\nCette action est irréversible.')) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer ce produit ?\n\nCette action est irréversible.')) {
         return;
     }
     
@@ -237,14 +255,14 @@ function deleteProduct(id, type) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('✅ ' + data.message);
+            alert(data.message);
             location.reload();
         } else {
-            alert('❌ ' + data.message);
+            alert(data.message);
         }
     })
     .catch(error => {
         console.error('Erreur:', error);
-        alert('❌ Une erreur est survenue');
+        alert(' Une erreur est survenue');
     });
-}
+};

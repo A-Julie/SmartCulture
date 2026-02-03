@@ -2,13 +2,7 @@
 session_start();
 
 require_once '../includes/auth_check.php';
-checkAuth();
-
-// Vérifier que l'utilisateur est admin
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    http_response_code(403);
-    die('Accès refusé');
-}
+requireAdmin(); // PROTECTION ADMIN
 
 $pdo = require_once '../database/connect_bdd.php';
 
